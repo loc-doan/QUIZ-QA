@@ -334,11 +334,14 @@
 
     <div id="resultModal" class="overlay">
         <div class="modal-box">
-            <h2>HOÀN THÀNH!</h2>
-            <p>Đúng: <b id="modalCorrect" style="color:var(--success); font-size: 1.5rem;">0/15</b></p>
-            <p>Điểm: <b id="modalScore" style="color:var(--primary); font-size: 1.5rem;">0</b></p>
-            <button class="btn-main" onclick="location.reload()"
-                style="background:var(--dark); margin-top:15px;">THOÁT</button>
+            <h2 id="result-title">HOÀN THÀNH!</h2>
+            <p>Kết quả trắc nghiệm:</p>
+            <div id="modalCorrect" style="color:var(--success); font-size: 2.5rem; font-weight:bold;">0/15</div>
+            <p>Tổng điểm trắc nghiệm tạm tính:</p>
+            <div id="modalScore" style="color:var(--primary); font-size: 2.5rem; font-weight:bold;">0</div>
+            <p style="color:#888; font-size:0.8rem; margin-top:10px;">Phần tự luận sẽ được quản lý chấm sau.</p>
+            <button class="btn-main" onclick="location.reload()" style="background:var(--dark); margin-top:20px;">ĐÓNG
+                HỆ THỐNG</button>
         </div>
     </div>
 
