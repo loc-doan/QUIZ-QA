@@ -1,266 +1,504 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ thống Thi KPI QA 2026 - Bảo mật</title>
     <style>
-        :root { --dark: #2c3e50; --primary: #1abc9c; --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
-        
+        :root {
+            --dark: #2c3e50;
+            --primary: #1abc9c;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --bg: #f4f7f6;
+        }
+
         /* Chống bôi đen toàn trang để tránh copy câu hỏi */
-        body { 
-            margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; 
-            background: var(--bg); overflow: hidden; 
-            -webkit-user-select: none; -ms-user-select: none; user-select: none;
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+            overflow: hidden;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         /* Cho phép bôi đen trong ô nhập liệu để nhân viên sửa bài */
-        textarea, input { -webkit-user-select: text; -ms-user-select: text; user-select: text; }
+        textarea,
+        input {
+            -webkit-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
 
         /* Modals & Screens */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--dark); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-        .modal-box { background: white; padding: 40px; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        .modal-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .btn-main { width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; background: var(--primary); }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            background: var(--primary);
+        }
 
         /* Main App Layout */
-        .main-app { display: none; height: 100vh; width: 100vw; }
-        .sidebar { width: 320px; background: var(--dark); padding: 20px; display: flex; flex-direction: column; box-sizing: border-box; }
-        .sidebar h2 { color: white; text-align: center; margin: 0 0 15px 0; font-size: 1.2rem; }
-        
-        .info-panel { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
-        #timer { font-size: 1.5rem; color: #f1c40f; font-weight: bold; margin-bottom: 5px; }
-        .user-tag { color: var(--primary); font-size: 0.85rem; }
+        .main-app {
+            display: none;
+            height: 100vh;
+            width: 100vw;
+        }
 
-        .exam-tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: #34495e; color: #abb2b9; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; }
-        .tab-btn.active { background: var(--primary); color: white; }
+        .sidebar {
+            width: 320px;
+            background: var(--dark);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
 
-        .question-grid { display: flex; flex-wrap: wrap; gap: 8px; flex-grow: 1; align-content: flex-start; overflow-y: auto; }
-        .q-btn { width: calc(20% - 7px); aspect-ratio: 1/1; cursor: pointer; border: none; background: #34495e; color: white; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .q-btn.active { background: var(--primary) !important; transform: scale(1.1); box-shadow: 0 0 10px rgba(26, 188, 156, 0.5); }
-        .q-btn.answered { background: var(--success); }
+        .sidebar h2 {
+            color: white;
+            text-align: center;
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+        }
 
-        .submit-btn { width: 100%; padding: 15px; background: var(--danger); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .info-panel {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #timer {
+            font-size: 1.5rem;
+            color: #f1c40f;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .user-tag {
+            color: var(--primary);
+            font-size: 0.85rem;
+        }
+
+        .exam-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #34495e;
+            color: #abb2b9;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .question-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex-grow: 1;
+            align-content: flex-start;
+            overflow-y: auto;
+        }
+
+        .q-btn {
+            width: calc(20% - 7px);
+            aspect-ratio: 1/1;
+            cursor: pointer;
+            border: none;
+            background: #34495e;
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .q-btn.active {
+            background: var(--primary) !important;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(26, 188, 156, 0.5);
+        }
+
+        .q-btn.answered {
+            background: var(--success);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
 
         /* Content Area */
-        .content { flex: 1; padding: 40px; background: white; overflow-y: auto; position: relative; }
-        .question-box { display: none; max-width: 800px; margin: 0 auto; }
-        .question-box.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .content {
+            flex: 1;
+            padding: 40px;
+            background: white;
+            overflow-y: auto;
+            position: relative;
+        }
 
-        .options-list { list-style: none; padding: 0; }
-        .options-list li { margin: 12px 0; padding: 15px; border: 1px solid #eee; border-radius: 10px; cursor: pointer; display: flex; align-items: center; }
-        .options-list li:hover { background: #f9f9f9; border-color: var(--primary); }
-        .options-list input { margin-right: 15px; transform: scale(1.2); }
-        
-        textarea { width: 100%; height: 350px; margin-top: 20px; padding: 20px; border: 2px solid #eee; border-radius: 12px; font-size: 16px; resize: none; box-sizing: border-box; }
+        .question-box {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .question-box.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options-list li {
+            margin: 12px 0;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .options-list li:hover {
+            background: #f9f9f9;
+            border-color: var(--primary);
+        }
+
+        .options-list input {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        textarea {
+            width: 100%;
+            height: 350px;
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: none;
+            box-sizing: border-box;
+        }
 
         /* Custom Confirm Modal */
-        #confirmModal, #resultModal { display: none; background: rgba(0,0,0,0.85); }
-        .confirm-btns { display: flex; gap: 10px; margin-top: 25px; }
-        .btn-cancel { flex: 1; padding: 12px; background: #95a5a6; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-confirm { flex: 1; padding: 12px; background: var(--danger); border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        #confirmModal,
+        #resultModal {
+            display: none;
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        .confirm-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            background: #95a5a6;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 12px;
+            background: var(--danger);
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
 
-<div id="login-screen" class="overlay">
-    <div class="modal-box">
-        <h2 style="margin-top:0">HỆ THỐNG THI KPI</h2>
-        <input type="text" id="input-name" placeholder="Họ và Tên nhân viên...">
-        <input type="text" id="input-id" placeholder="Mã thẻ nhân viên...">
-        <button class="btn-main" onclick="startExam()">BẮT ĐẦU LÀM BÀI (30P)</button>
-    </div>
-</div>
-
-<div id="main-app" class="main-app">
-    <div class="sidebar">
-        <h2>QA EXAM 2026</h2>
-        <div class="info-panel">
-            <div id="timer">30:00</div>
-            <div id="user-display" class="user-tag"></div>
-        </div>
-        <div class="exam-tabs">
-            <button id="tab-quiz" class="tab-btn active" onclick="switchSection('quiz')">TRẮC NGHIỆM</button>
-            <button id="tab-essay" class="tab-btn" onclick="switchSection('essay')">TỰ LUẬN</button>
-        </div>
-        <div id="btn-container" class="question-grid"></div>
-        <button id="final-submit" class="submit-btn" onclick="openConfirm()">NỘP BÀI</button>
-    </div>
-    <div id="questions-container" class="content"></div>
-</div>
-
-<div id="confirmModal" class="overlay">
-    <div class="modal-box">
-        <h3 style="color:var(--danger)">XÁC NHẬN NỘP BÀI?</h3>
-        <p>Hệ thống sẽ ghi nhận kết quả và không thể sửa đổi sau khi nộp.</p>
-        <div class="confirm-btns">
-            <button class="btn-cancel" onclick="closeConfirm()">HỦY</button>
-            <button class="btn-confirm" onclick="executeSubmit()">XÁC NHẬN</button>
+    <div id="login-screen" class="overlay">
+        <div class="modal-box">
+            <h2 style="margin-top:0">HỆ THỐNG THI KPI</h2>
+            <input type="text" id="input-name" placeholder="Họ và Tên nhân viên...">
+            <input type="text" id="input-id" placeholder="Mã thẻ nhân viên...">
+            <button class="btn-main" onclick="startExam()">BẮT ĐẦU LÀM BÀI (30P)</button>
         </div>
     </div>
-</div>
 
-<div id="resultModal" class="overlay">
-    <div class="modal-box">
-        <h2>HOÀN THÀNH!</h2>
-        <p>Đúng: <b id="modalCorrect" style="color:var(--success); font-size: 1.5rem;">0/15</b></p>
-        <p>Điểm: <b id="modalScore" style="color:var(--primary); font-size: 1.5rem;">0</b></p>
-        <button class="btn-main" onclick="location.reload()" style="background:var(--dark); margin-top:15px;">THOÁT</button>
+    <div id="main-app" class="main-app">
+        <div class="sidebar">
+            <h2>QA EXAM 2026</h2>
+            <div class="info-panel">
+                <div id="timer">30:00</div>
+                <div id="user-display" class="user-tag"></div>
+            </div>
+            <div class="exam-tabs">
+                <button id="tab-quiz" class="tab-btn active" onclick="switchSection('quiz')">TRẮC NGHIỆM</button>
+                <button id="tab-essay" class="tab-btn" onclick="switchSection('essay')">TỰ LUẬN</button>
+            </div>
+            <div id="btn-container" class="question-grid"></div>
+            <button id="final-submit" class="submit-btn" onclick="openConfirm()">NỘP BÀI</button>
+        </div>
+        <div id="questions-container" class="content"></div>
     </div>
-</div>
 
-<script>
-    // --- CẤU HÌNH BẢO MẬT (CÁCH 2) ---
-    // 1. Chống chuột phải
-    document.addEventListener('contextmenu', event => event.preventDefault());
+    <div id="confirmModal" class="overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--danger)">XÁC NHẬN NỘP BÀI?</h3>
+            <p>Hệ thống sẽ ghi nhận kết quả và không thể sửa đổi sau khi nộp.</p>
+            <div class="confirm-btns">
+                <button class="btn-cancel" onclick="closeConfirm()">HỦY</button>
+                <button class="btn-confirm" onclick="executeSubmit()">XÁC NHẬN</button>
+            </div>
+        </div>
+    </div>
 
-    // 2. Chống phím tắt F12, Ctrl+U, Ctrl+Shift+I...
-    document.onkeydown = function(e) {
-        if (e.keyCode == 123) return false; // F12
-        if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-        if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
-        if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
-        if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
-        if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
-    };
+    <div id="resultModal" class="overlay">
+        <div class="modal-box">
+            <h2>HOÀN THÀNH!</h2>
+            <p>Đúng: <b id="modalCorrect" style="color:var(--success); font-size: 1.5rem;">0/15</b></p>
+            <p>Điểm: <b id="modalScore" style="color:var(--primary); font-size: 1.5rem;">0</b></p>
+            <button class="btn-main" onclick="location.reload()"
+                style="background:var(--dark); margin-top:15px;">THOÁT</button>
+        </div>
+    </div>
 
-    // --- LOGIC ỨNG DỤNG ---
-    const scriptURL = 'DÁN_LINK_WEB_APP_CỦA_BẠN_VÀO_ĐÂY';
-    let userInfo = { name: "", id: "" };
-    let timeLeft = 30 * 60; 
-    let timerInterval;
-    let currentSection = 'quiz';
-    let userAnswers = { quiz: {}, essay: {} };
+    <script>
+        // --- CẤU HÌNH BẢO MẬT (CÁCH 2) ---
+        // 1. Chống chuột phải
+        document.addEventListener('contextmenu', event => event.preventDefault());
 
-    const quizData = [
-        { id: 1, q: "Mã vải nào sau đây là mã vải mài lông (磨毛面料)?", options: ["121599MS1-H068", "1207592MS1-D1", "TEJ85321-H31", "Tất cả đều đúng"], correct: "A" },
-        { id: 2, q: "Mã vải hậu tố bao gồm chữ B có ý nghĩa gì?", options: ["Vải sử dụng mặt phải", "Vải sử dụng mặt trái", "Cả A và B đều sai", "Cả A và B đều đúng"], correct: "B" },
-        { id: 3, q: "Loại vải nào sau đây là loại vải 2 mặt kết cấu dệt giống nhau?", options: ["TEI88511-1KN", "MFC3X2T3400392S2", "CNJ9278MS1", "FC22EJ89169MS1"], correct: "A" },
-        { id: 4, q: "Tiêu chuẩn kéo giãn ngang 145%-185%, thực tế 144% thể hiện gì?", options: ["Độ kéo giãn ngang chặt hơn tiêu chuẩn", "Độ kéo giãn dọc chặt hơn tiêu chuẩn", "Độ kéo giãn ngang lỏng hơn tiêu chuẩn", "Tất cả đều sai"], correct: "A" },
-        { id: 5, q: "Mục đích chính của việc kiểm tra độ co rút (shrinkage) là gì?", options: ["Đo độ bền kéo", "Kiểm tra thấm hút nước", "Xác định thay đổi kích thước sau giặt/nhiệt", "Đánh giá độ mịn bề mặt"], correct: "C" },
-        { id: 6, q: "Lý do chính gây ra sự biến màu của vải sau khi ép cúp ngực là gì?", options: ["Nhiệt độ/áp lực phá vỡ phân tử màu", "Tiếp xúc hóa chất xà phòng", "Tác động ánh sáng mạnh", "Co rút quá mức"], correct: "A" },
-        { id: 7, q: "QA Hanger dùng để tham khảo dữ liệu gì?", options: ["Trái phải, hoa văn, tay, ngoại quan", "Thí nghiệm, tay, ngoại quan", "Tay, khổ, cân nặng", "Tất cả đều đúng"], correct: "A" },
-        { id: 8, q: "Kiểm vải in hoa cần chú ý gì?", options: ["Vị trí kết nối bản in", "Mật độ, loang màu, tuần hoàn", "Thấm sang mặt trái", "Tất cả đều đúng"], correct: "D" },
-        { id: 9, q: "Tốc độ kiểm nghiệm chính xác cho màu nhạt là bao nhiêu?", options: ["12-14Y/phút", "16-18Y/phút", "18-20Y/phút", "20-22Y/phút"], correct: "C" },
-        { id: 10, q: "Làm thế nào để phân biệt mức độ đậm nhạt của màu sắc?", options: ["Dùng thước xám", "Gọi cấp trên", "Dùng mắt thường", "Dựa vào mã màu"], correct: "A" },
-        { id: 11, q: "Lỗi phát sinh nào KHÔNG do bộ phận dệt tạo ra?", options: ["Nhuộm không ăn màu", "Quăn viền", "Loang màu", "Đường ngang"], correct: "C" },
-        { id: 12, q: "Các lỗi phát sinh trong quá trình nhuộm vải thành phẩm?", options: ["Vết chân gà", "Vết gấp dọc", "Vết dừng máy", "Cả 3 đáp án"], correct: "D" },
-        { id: 13, q: "Lỗi phát sinh trong quá trình định hình?", options: ["Sọc màu", "Đốm chất trợ", "Sợi móc đường cố định", "Vết chân gà"], correct: "B" },
-        { id: 14, q: "Tiêu chuẩn Skew khách hàng UQ là bao nhiêu?", options: ["+/- 1%", "+/- 2%", "+/- 3%", "+/- 5%"], correct: "C" },
-        { id: 15, q: "1 yard: 1 dừng máy, 1 sợi móc, 1 điểm màu. Điểm trừ hệ 4 là?", options: ["4 điểm", "6 điểm", "8 điểm", "Theo kích thước"], correct: "C" }
-    ];
-
-    const essayData = [
-        { id: 1, q: "Khi nhận được khiếu nại từ khách hàng, QA cần làm gì?" },
-        { id: 2, q: "Nếu QC liên kiểm kiểm 2 lô liên tiếp cùng một loại lỗi, QA xử lý thế nào?" },
-        { id: 3, q: "Khách phản ánh chênh màu nhưng nội bộ kiểm tra không thấy vấn đề, xử lý thế nào?" },
-        { id: 4, q: "Nêu rõ các mục đánh giá 8S và ý nghĩa?" },
-        { id: 5, q: "Khi nhận được phản ánh độ bền màu không đạt, QA xử lý thế nào?" }
-    ];
-
-    function startExam() {
-        const n = document.getElementById('input-name').value.trim();
-        const i = document.getElementById('input-id').value.trim();
-        if(!n || !i) return alert("Vui lòng nhập đủ thông tin!");
-        userInfo = { name: n, id: i };
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'flex';
-        document.getElementById('user-display').innerText = `${n} - ${i}`;
-        renderApp();
-        startTimer();
-    }
-
-    function startTimer() {
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            let min = Math.floor(timeLeft / 60);
-            let sec = timeLeft % 60;
-            document.getElementById('timer').innerText = `${min}:${sec < 10 ? '0' : ''}${sec}`;
-            if(timeLeft <= 0) {
-                clearInterval(timerInterval);
-                executeSubmit();
-            }
-        }, 1000);
-    }
-
-    function switchSection(s) {
-        currentSection = s;
-        document.getElementById('tab-quiz').classList.toggle('active', s === 'quiz');
-        document.getElementById('tab-essay').classList.toggle('active', s === 'essay');
-        renderApp();
-    }
-
-    function renderApp() {
-        const bCont = document.getElementById('btn-container');
-        const qCont = document.getElementById('questions-container');
-        bCont.innerHTML = ''; qCont.innerHTML = '';
-        const data = (currentSection === 'quiz') ? quizData : essayData;
-
-        data.forEach((item, index) => {
-            const btn = document.createElement('button');
-            btn.innerText = (currentSection === 'quiz' ? 'TN' : 'TL') + item.id;
-            btn.id = `btn-${currentSection}-${item.id}`;
-            btn.className = `q-btn ${index === 0 ? 'active' : ''}`;
-            if(userAnswers[currentSection][item.id] && String(userAnswers[currentSection][item.id]).trim() !== "") btn.classList.add('answered');
-            btn.onclick = () => showQuestion(item.id);
-            bCont.appendChild(btn);
-
-            const qBox = document.createElement('div');
-            qBox.id = `q-${currentSection}-${item.id}`;
-            qBox.className = `question-box ${index === 0 ? 'active' : ''}`;
-            if (currentSection === 'quiz') {
-                qBox.innerHTML = `<h3>Câu ${item.id}: ${item.q}</h3><div class="options-list">${item.options.map((opt, i) => {
-                    const v = ['A','B','C','D'][i];
-                    const chk = userAnswers.quiz[item.id] === v ? 'checked' : '';
-                    return `<li><label><input type="radio" name="q${item.id}" value="${v}" ${chk} onchange="saveAnswer('quiz',${item.id},'${v}')"> <b>${v}.</b> ${opt}</label></li>`;
-                }).join('')}</div>`;
-            } else {
-                qBox.innerHTML = `<h3>Câu ${item.id}: ${item.q}</h3><textarea oninput="saveAnswer('essay',${item.id},this.value)">${userAnswers.essay[item.id] || ""}</textarea>`;
-            }
-            qCont.appendChild(qBox);
-        });
-    }
-
-    function saveAnswer(type, id, val) {
-        userAnswers[type][id] = val;
-        const btn = document.getElementById(`btn-${type}-${id}`);
-        if(val.trim() !== "") btn.classList.add('answered'); else btn.classList.remove('answered');
-    }
-
-    function showQuestion(n) {
-        document.querySelectorAll('.question-box').forEach(q => q.classList.remove('active'));
-        document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`q-${currentSection}-${n}`).classList.add('active');
-        document.getElementById(`btn-${currentSection}-${n}`).classList.add('active');
-    }
-
-    function openConfirm() { document.getElementById('confirmModal').style.display = 'flex'; }
-    function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
-
-    async function executeSubmit() {
-        clearInterval(timerInterval);
-        closeConfirm();
-        let correct = 0;
-        quizData.forEach(item => { if(userAnswers.quiz[item.id] === item.correct) correct++; });
-        
-        const payload = {
-            userName: userInfo.name, userId: userInfo.id,
-            correctCount: `${correct}/15`, totalScore: correct * 4,
-            essayAnswers: essayData.map(item => userAnswers.essay[item.id] || "(Trống)")
+        // 2. Chống phím tắt F12, Ctrl+U, Ctrl+Shift+I...
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false;
         };
 
-        const b = document.getElementById('final-submit');
-        b.disabled = true; b.innerText = "ĐANG GỬI...";
+        // --- LOGIC ỨNG DỤNG ---
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwfRrM8c9AKGFVOkYdBLj2Df0tcz9mwDtg5-jDKkeqDFzR74JlGqflY-nIXlwKnrwai/exec';
+        let userInfo = { name: "", id: "" };
+        let timeLeft = 30 * 60;
+        let timerInterval;
+        let currentSection = 'quiz';
+        let userAnswers = { quiz: {}, essay: {} };
 
-        try {
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            document.getElementById('modalCorrect').innerText = `${correct}/15`;
-            document.getElementById('modalScore').innerText = correct * 4;
-            document.getElementById('resultModal').style.display = 'flex';
-        } catch(e) { alert("Lỗi kết nối!"); b.disabled = false; b.innerText = "THỬ LẠI"; }
-    }
-</script>
+        // Dữ liệu câu hỏi [cite: 1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 14, 15, 17, 18, 19, 21]
+        const quizData = [
+            { id: 1, q: "Mã vải nào sau đây là mã vải mài lông (磨毛面料)?", options: ["121599MS1-H068", "1207592MS1-D1", "TEJ85321-H31", "Tất cả đều đúng"], correct: "D" },
+            { id: 2, q: "Mã vải hậu tố bao gồm chữ B có ý nghĩa gì?", options: ["Vải sử dụng mặt phải", "Vải sử dụng mặt trái", "Cả A và B đều sai", "Cả A và B đều đúng"], correct: "B" },
+            { id: 3, q: "Loại vải nào sau đây là loại vải 2 mặt kết cấu dệt giống nhau?", options: ["TEI88511-1KN", "MFC3X2T3400392S2", "CNJ9278MS1", "FC22EJ89169MS1"], correct: "A" },
+            { id: 4, q: "Tiêu chuẩn kéo giãn ngang 145%-185%, thực tế 144% thể hiện gì?", options: ["Độ kéo giãn ngang chặt hơn tiêu chuẩn", "Độ kéo giãn dọc chặt hơn tiêu chuẩn", "Độ kéo giãn ngang lỏng hơn tiêu chuẩn", "Tất cả đều sai"], correct: "A" },
+            { id: 5, q: "Mục đích chính của việc kiểm tra độ co rút (shrinkage) là gì?", options: ["Đo độ bền kéo", "Kiểm tra thấm hút nước", "Xác định thay đổi kích thước sau giặt/nhiệt", "Đánh giá độ mịn bề mặt"], correct: "C" },
+            { id: 6, q: "Lý do chính gây ra biến màu vải sau khi ép cúp ngực là gì?", options: ["Nhiệt độ/áp lực phá vỡ phân tử màu", "Tiếp xúc hóa chất xà phòng", "Tác động ánh sáng mạnh", "Co rút quá mức"], correct: "A" },
+            { id: 7, q: "QA Hanger dùng để tham khảo dữ liệu gì?", options: ["Trái phải, hoa văn, tay, ngoại quan", "Thí nghiệm, tay, ngoại quan", "Tay, khổ, cân nặng", "Tất cả đều đúng"], correct: "A" },
+            { id: 8, q: "Kiểm vải in hoa cần chú ý gì?", options: ["Vị trí kết nối bản in", "Mật độ, loang màu, tuần hoàn", "Thấm sang mặt trái", "Tất cả đều đúng"], correct: "D" },
+            {
+                id: 9, q: "Tốc độ kiểm nghiệm chính xác cho màu nhạt là bao nhiêu?", options: ["Màu trắng 12-14Y/phút, màu nhạt 16-18Y/phút, màu đâm 20-22Y/phút, in hoa 12-14Y/phút",
+                    "Màu trắng 14-16Y/phút, màu nhạt 18-20Y/phút, màu đâm 20-22Y/phút, in hoa 12-14Y/phút",
+                    "Màu trắng 16-18Y/phút, màu nhạt 18-20Y/phút, màu đâm 20-22Y/phút, in hoa 14-16Y/phút",
+                    "Tất cả đều đúng"], correct: "C"
+            },
+            { id: 10, q: "Làm thế nào để phân biệt mức độ đậm nhạt của màu sắc?", options: ["Dùng thước xám", "Gọi cấp trên", "Dùng mắt thường", "Dựa vào mã màu"], correct: "D" },
+            { id: 11, q: "Lỗi phát sinh nào KHÔNG do bộ phận dệt tạo ra?", options: ["Nhuộm không ăn màu", "Quăn viền", "Loang màu", "Đường ngang"], correct: "D" },
+            { id: 12, q: "Lỗi phát sinh trong quá trình nhuộm vải thành phẩm?", options: ["Vết chân gà", "Vết gấp dọc", "Vết dừng máy", "Cả 3 đáp án"], correct: "A" },
+            { id: 13, q: "Lỗi phát sinh trong quá trình định hình thành phẩm?", options: ["Sọc màu", "Đốm chất trợ", "Sợi móc đường cố định", "Vết chân gà"], correct: "C" },
+            { id: 14, q: "Tiêu chuẩn Skew khách hàng UQ là bao nhiêu?", options: ["+/- 1%", "+/- 2%", "+/- 3%", "+/- 5%"], correct: "C" },
+            { id: 15, q: "1 yard: 1 dừng máy, 1 sợi móc, 1 điểm màu. Điểm trừ hệ 4 là?", options: ["4 điểm", "6 điểm", "8 điểm", "Theo kích thước"], correct: "C" }
+        ];
+
+        const essayData = [
+            { id: 1, q: "Khi nhận khiếu nại từ khách hàng, QA cần làm gì?" },
+            { id: 2, q: "Nếu QC kiểm 2 lô liên tiếp cùng 1 loại lỗi, xử lý thế nào?" },
+            { id: 3, q: "Khách phản ánh chênh màu nhưng nội bộ kiểm tra không thấy lỗi, xử lý thế nào?" },
+            { id: 4, q: "Nêu rõ các mục đánh giá 8S và ý nghĩa?" },
+            { id: 5, q: "Nhận phản ánh độ bền màu không đạt, QA xử lý thế nào?" }
+        ];
+
+        function startExam() {
+            const n = document.getElementById('input-name').value.trim();
+            const i = document.getElementById('input-id').value.trim();
+            if (!n || !i) return alert("Vui lòng nhập đủ thông tin!");
+            userInfo = { name: n, id: i };
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            document.getElementById('user-display').innerText = `${n} - ${i}`;
+            renderApp();
+            startTimer();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                let min = Math.floor(timeLeft / 60);
+                let sec = timeLeft % 60;
+                document.getElementById('timer').innerText = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    executeSubmit();
+                }
+            }, 1000);
+        }
+
+        function switchSection(s) {
+            currentSection = s;
+            document.getElementById('tab-quiz').classList.toggle('active', s === 'quiz');
+            document.getElementById('tab-essay').classList.toggle('active', s === 'essay');
+            renderApp();
+        }
+
+        function renderApp() {
+            const bCont = document.getElementById('btn-container');
+            const qCont = document.getElementById('questions-container');
+            bCont.innerHTML = ''; qCont.innerHTML = '';
+            const data = (currentSection === 'quiz') ? quizData : essayData;
+
+            data.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.innerText = (currentSection === 'quiz' ? 'TN' : 'TL') + item.id;
+                btn.id = `btn-${currentSection}-${item.id}`;
+                btn.className = `q-btn ${index === 0 ? 'active' : ''}`;
+                if (userAnswers[currentSection][item.id] && String(userAnswers[currentSection][item.id]).trim() !== "") btn.classList.add('answered');
+                btn.onclick = () => showQuestion(item.id);
+                bCont.appendChild(btn);
+
+                const qBox = document.createElement('div');
+                qBox.id = `q-${currentSection}-${item.id}`;
+                qBox.className = `question-box ${index === 0 ? 'active' : ''}`;
+                if (currentSection === 'quiz') {
+                    qBox.innerHTML = `<h3>Câu ${item.id}: ${item.q}</h3><div class="options-list">${item.options.map((opt, i) => {
+                        const v = ['A', 'B', 'C', 'D'][i];
+                        const chk = userAnswers.quiz[item.id] === v ? 'checked' : '';
+                        return `<li><label><input type="radio" name="q${item.id}" value="${v}" ${chk} onchange="saveAnswer('quiz',${item.id},'${v}')"> <b>${v}.</b> ${opt}</label></li>`;
+                    }).join('')}</div>`;
+                } else {
+                    qBox.innerHTML = `<h3>Câu ${item.id}: ${item.q}</h3><textarea oninput="saveAnswer('essay',${item.id},this.value)">${userAnswers.essay[item.id] || ""}</textarea>`;
+                }
+                qCont.appendChild(qBox);
+            });
+        }
+
+        function saveAnswer(type, id, val) {
+            userAnswers[type][id] = val;
+            const btn = document.getElementById(`btn-${type}-${id}`);
+            if (val.trim() !== "") btn.classList.add('answered'); else btn.classList.remove('answered');
+        }
+
+        function showQuestion(n) {
+            document.querySelectorAll('.question-box').forEach(q => q.classList.remove('active'));
+            document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`q-${currentSection}-${n}`).classList.add('active');
+            document.getElementById(`btn-${currentSection}-${n}`).classList.add('active');
+        }
+
+        function openConfirm() { document.getElementById('confirmModal').style.display = 'flex'; }
+        function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
+
+        async function executeSubmit() {
+            clearInterval(timerInterval);
+            closeConfirm();
+            let correct = 0;
+            quizData.forEach(item => { if (userAnswers.quiz[item.id] === item.correct) correct++; });
+
+            const payload = {
+                userName: userInfo.name, userId: userInfo.id,
+                correctCount: `${correct}/15`, totalScore: correct * 4,
+                essayAnswers: essayData.map(item => userAnswers.essay[item.id] || "(Trống)")
+            };
+
+            const b = document.getElementById('final-submit');
+            b.disabled = true; b.innerText = "ĐANG GỬI...";
+
+            try {
+                await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                document.getElementById('modalCorrect').innerText = `${correct}/15`;
+                document.getElementById('modalScore').innerText = correct * 4;
+                document.getElementById('resultModal').style.display = 'flex';
+            } catch (e) { alert("Lỗi kết nối!"); b.disabled = false; b.innerText = "THỬ LẠI"; }
+        }
+    </script>
 </body>
+
 </html>
